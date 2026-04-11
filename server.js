@@ -35,10 +35,7 @@ app.post("/register", async (req, res) => {
 });
 
 // get all patients
-app.get("/patients", (req, res) => {
-    res.json(patients);
-    
-});
+
 app.get("/identify", async (req, res) => {
     const name = req.query.name;
 
