@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Patient Summary</title>
+</head>
+<body>
+
+<h2>Patient Summary</h2>
+
+<div id="summary"></div>
+
+<button onclick="goBack()">Back to Identify</button>
+
+<script>
+function loadPatientSummary() {
+    // Get the last patient with medical history from localStorage
+    const patient = JSON.parse(localStorage.getItem("currentPatient"));
+    
+    if (!patient) {
+        document.getElementById("summary").innerHTML = "<p style='color:red;'>No patient selected.</p>";
+        return;
+    }
+
+    // Display patient details
+    let html = `
+        <h3>Patient Details</h3>
+        <p><strong>Name:</strong> ${patient.name}</p>
+        <p><strong>Age:</strong> ${patient.age}</p>
+        <p><strong>Gender:</strong> ${patient.gender}</p>
+        <p><strong>Fingerprint ID:</strong> ${patient.fingerprintID}</p>
+        <img src="${patient.photo}" alt="Patient Photo" style="width:150px;height:auto;border:1px solid #000;">
+    `;
+
+    // Display medical history if it exists
+    if (patient.medicalHistory) {
+        html += `
+            <h3>Medical History</h3>
+            <p><strong>Allergies:</strong> ${patient.medicalHistory.allergies || "N/A"}</p>
+            <p><strong>Existing Conditions:</strong> ${patient.medicalHistory.conditions || "N/A"}</p>
+            <p><strong>Medication:</strong> ${patient.medicalHistory.medication || "N/A"}</p>
+            <p><strong>Blood Group:</strong> ${patient.medicalHistory.blood || "N/A"}</p>
+        `;
+    } else {
+        html += "<p>No medical history submitted yet.</p>";
+    }
+
+    document.getElementById("summary").innerHTML = html;
+}
+
+function goBack() {
+    window.location.href = "identify.html";
+}
+
+// Load summary on page load
+window.onload = loadPatientSummary;
+</script>
+
+</body>
+</html>

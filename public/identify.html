@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Identify Patient</title>
+    <style>
+        /* Body with hospital background */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            background: url('https://images.unsplash.com/photo-1588776814546-503e345edaa6?auto=format&fit=crop&w=1950&q=80') no-repeat center center fixed;
+            background-size: cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        /* Overlay for readability */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0, 123, 255, 0.4);
+            z-index: 0;
+        }
+
+        /* Main card */
+        .card-container {
+            position: relative;
+            z-index: 1;
+            background: white;
+            padding: 40px 50px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            width: 450px;
+            max-width: 90%;
+        }
+
+        h2, h3 {
+            text-align: center;
+            color: #007BFF;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px 15px;
+            margin: 10px 0 20px 0;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            font-size: 16px;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            font-size: 18px;
+            border: none;
+            border-radius: 12px;
+            background-color: #007BFF;
+            color: white;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        button:hover {
+            background-color: #0056b3;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+
+        .back-button {
+            background-color: #6c757d;
+        }
+
+        .back-button:hover {
+            background-color: #495057;
+        }
+
+        /* Patient info display */
+        #patientInfo {
+            margin-top: 20px;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        #patientInfo img {
+            width: 100%;
+            max-height: 200px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-top: 10px;
+        }
+
+        /* Medical history form */
+        #medicalFormDiv {
+            margin-top: 20px;
+        }
+
+        #medicalFormDiv input[type="text"] {
+            width: 100%;
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 500px) {
+            .card-container {
+                padding: 30px 20px;
+                width: 95%;
+            }
+
+            button {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="card-container">
+    <h2>Identify Patient</h2>
+
+    <input type="text" id="searchFP" placeholder="Enter Fingerprint ID">
+    <button onclick="findPatient()">Search</button>
+    <button class="back-button" onclick="location.href='index.html'">Back to Dashboard</button>
+
+    <div id="patientInfo"></div>
+
+    <!-- Medical Form (hidden initially) -->
+    <div id="medicalFormDiv" style="display:none;">
+        <h3>Medical History Form</h3>
+        <input type="text" id="allergies" placeholder="Allergies">
+        <input type="text" id="conditions" placeholder="Existing Conditions">
+        <input type="text" id="medication" placeholder="Medication">
+        <input type="text" id="blood" placeholder="Blood Group">
+        <button onclick="submitMedical()">Submit Medical History</button>
+    </div>
+</div>
+
+<script>
+    // Load patients from localStorage
+    const patients = JSON.parse(localStorage.getItem("patients") || "[]");
+
+    function findPatient() {
+        const fpID = document.getElementById("searchFP").value.trim();
+        const patient = patients.find(p => p.fingerprintID === fpID);
+        const infoDiv = document.getElementById("patientInfo");
+        const formDiv = document.getElementById("medicalFormDiv");
+
+        if (patient) {
+            infoDiv.innerHTML = `
+                <p><strong>Name:</strong> ${patient.name}</p>
+                <p><strong>Age:</strong> ${patient.age}</p>
+                <p><strong>Gender:</strong> ${patient.gender}</p>
+                <img src="${patient.photo}" alt="Patient Photo">
+            `;
+            formDiv.style.display = "block";
+
+            // Pre-fill medical form if already exists
+            if (patient.medicalHistory) {
+                document.getElementById("allergies").value = patient.medicalHistory.allergies || '';
+                document.getElementById("conditions").value = patient.medicalHistory.conditions || '';
+                document.getElementById("medication").value = patient.medicalHistory.medication || '';
+                document.getElementById("blood").value = patient.medicalHistory.blood || '';
+            } else {
+                document.getElementById("allergies").value = '';
+                document.getElementById("conditions").value = '';
+                document.getElementById("medication").value = '';
+                document.getElementById("blood").value = '';
+            }
+
+        } else {
+            infoDiv.innerHTML = "<p style='color:red; text-align:center;'>Patient not found.</p>";
+            formDiv.style.display = "none";
+        }
+    }
+
+    function submitMedical() {
+        const fpID = document.getElementById("searchFP").value.trim();
+        const patientIndex = patients.findIndex(p => p.fingerprintID === fpID);
+        if (patientIndex === -1) return alert("Patient not found.");
+
+        const allergies = document.getElementById("allergies").value.trim();
+        const conditions = document.getElementById("conditions").value.trim();
+        const medication = document.getElementById("medication").value.trim();
+        const blood = document.getElementById("blood").value.trim();
+
+        patients[patientIndex].medicalHistory = { allergies, conditions, medication, blood };
+        localStorage.setItem("patients", JSON.stringify(patients));
+
+        alert("Medical history submitted successfully!");
+    }
+</script>
+
+</body>
+</html>
