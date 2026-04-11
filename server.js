@@ -1,3 +1,17 @@
+const mongoose = require("mongoose");
+
+mongoose.connect("mongodb+srv://preciousben18_db_user:<Royal2024>@cluster0.ctyo0ho.mongodb.net/?appName=Cluster0")
+.then(() => console.log("MongoDB Connected"))
+.catch(err => console.log(err));
+
+const patientSchema = new mongoose.Schema({
+    name: String,
+    age: Number,
+    condition: String,
+    fingerprint: String
+});
+
+const Patient = mongoose.model("Patient", patientSchema);
 const express = require("express");
 const path = require("path");
 
@@ -11,30 +25,30 @@ app.use(express.static(path.join(__dirname, "public")));
 let patients = [];
 
 // register patient
-app.post("/register", (req, res) => {
-    console.log("Request received:", req.body); // 👈 debug
+app.post("/register", async (req, res) => {
+    const patient = req.body;
 
-    const { name, age, gender, fingerprint, photo } = req.body;
+    const newPatient = new Patient(patient);
+    await newPatient.save();
 
-    const patient = {
-        id: patients.length + 1,
-        name,
-        age,
-        gender,
-        fingerprint,
-        photo
-    };
-
-    patients.push(patient);
-
-    console.log("Saved:", patient);
-
-    res.json({ message: "Patient saved successfully" });
+    res.json({ message: "Patient saved to database" });
 });
 
 // get all patients
 app.get("/patients", (req, res) => {
     res.json(patients);
+    
+});
+app.get("/identify", async (req, res) => {
+    const name = req.query.name;
+
+    const result = await Patient.findOne({ name: name });
+
+    if (result) {
+        res.json(result);
+    } else {
+        res.json({ message: "Patient not found" });
+    }
 });
 
 app.listen(3000, () => {
