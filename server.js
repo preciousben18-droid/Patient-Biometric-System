@@ -5,7 +5,6 @@ const mongoose = require("mongoose");
 mongoose.connect(process.env.MONGO_URI)
 .then(() => console.log("MongoDB Connected"))
 .catch(err => console.log(err));
-const mongoose = require("mongoose");
 
 mongoose.connect("mongodb+srv://preciousben18_db_user:<Royal2024>@cluster0.ctyo0ho.mongodb.net/?appName=Cluster0")
 .then(() => console.log("MongoDB Connected"))
