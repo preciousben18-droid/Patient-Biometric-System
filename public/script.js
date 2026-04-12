@@ -58,3 +58,13 @@ async function registerPatient() {
 
     reader.readAsDataURL(photo);
 }
+const token = localStorage.getItem("token");
+
+fetch("/register", {
+    method: "POST",
+    headers: {
+        "Content-Type": "application/json",
+        "Authorization": token
+    },
+    body: JSON.stringify(patient)
+});
